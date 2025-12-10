@@ -1,0 +1,15 @@
+--LOADER FORGE
+
+
+local queueteleport = queue_on_teleport 
+    or (syn and syn.queue_on_teleport) 
+    or (fluxus and fluxus.queue_on_teleport)
+
+if queueteleport then
+    queueteleport([[
+        loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/ecfcccea43f60fa4c46009f854c06a52.lua"))()
+    ]])
+    print("Polluted Loader will run on next server hop")
+else
+    warn("Your exploit does not support queue_on_teleport, loader cannot persist")
+end
