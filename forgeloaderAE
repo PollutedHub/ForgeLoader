@@ -1,24 +1,22 @@
 -- GITHUB PERSISTENT LOADER
--- Robust single Luarmor execution per server
+-- Robust single Luarmor execution per server, fast rejoin safe
 
 local QueueTeleport =
     queue_on_teleport
     or (syn and syn.queue_on_teleport)
     or (fluxus and fluxus.queue_on_teleport)
 
--- Initialize executed servers table if needed
-if not _G.ExecutedServers then
-    _G.ExecutedServers = {}
-end
+-- Ensure per-server executed table exists
+if not _G.ExecutedServers then _G.ExecutedServers = {} end
 
 local jobId = game.JobId
 
--- Only execute Luarmor once per server
+-- Use a per-server, per-executor session lock
 if not _G.ExecutedServers[jobId] then
-    -- Immediately set the lock to prevent race conditions on fast rejoins
+    -- Lock immediately to prevent race conditions
     _G.ExecutedServers[jobId] = true
 
-    -- 1️⃣ Queue GitHub loader for the next server (Luarmor NOT included)
+    -- Queue loader for next hop (Luarmor NOT included)
     if QueueTeleport then
         QueueTeleport([[
             loadstring(game:HttpGet("https://raw.githubusercontent.com/PollutedHub/ForgeLoader/refs/heads/main/forgeloaderAE"))()
@@ -26,21 +24,16 @@ if not _G.ExecutedServers[jobId] then
         print("GitHub loader queued for next server")
     end
 
-    -- 2️⃣ Execute Luarmor immediately, deferred to ensure lock is set first
-    task.defer(function()
-        pcall(function()
-            loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/ecfcccea43f60fa4c46009f854c06a52.lua"))()
-        end)
-        print("Luarmor executed on this server")
+    -- Execute Luarmor immediately
+    local success, err = pcall(function()
+        loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/ecfcccea43f60fa4c46009f854c06a52.lua"))()
     end)
-else
-    -- Already executed on this server, skip
-    print("Luarmor already executed on this server, skipping")
-end
 
--- Optional debug loop
-local startTime = tick()
-while tick() - startTime < 2 do
-    print("DONE")
-    task.wait()
+    if success then
+        print("Luarmor executed on this server")
+    else
+        warn("Failed to execute Luarmor:", err)
+    end
+else
+    print("Luarmor already executed on this server, skipping")
 end
