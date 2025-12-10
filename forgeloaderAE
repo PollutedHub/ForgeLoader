@@ -33,4 +33,10 @@ end
 _G.LastTeleportTime = tick()
 
 
-print("DONE")
+local duration = 2
+local startTime = tick()
+
+while tick() - startTime < duration do
+	print("DONE")
+	task.wait() 
+end
