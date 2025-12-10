@@ -5,23 +5,32 @@ local QueueTeleport =
     or (fluxus and fluxus.queue_on_teleport)
 
 
-if QueueTeleport then
-    QueueTeleport([[
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/PollutedHub/ForgeLoader/refs/heads/main/forgeloaderAE"))()
+if not _G.LastJobId then _G.LastJobId = "" end
+
+if _G.LastJobId ~= game.JobId then
+    _G.LastJobId = game.JobId
+
+
+    if QueueTeleport then
+        QueueTeleport([[
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/PollutedHub/ForgeLoader/refs/heads/main/forgeloaderAE"))()
+            loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/ecfcccea43f60fa4c46009f854c06a52.lua"))()
+        ]])
+    end
+
+   
+    pcall(function()
         loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/ecfcccea43f60fa4c46009f854c06a52.lua"))()
-    ]])
+    end)
+
+    print("Forge GitHub loader executed + queued for next hop")
+else
+   
+    print("Luarmor already executed on this server, skipping")
 end
-
-
-pcall(function()
-    loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/ecfcccea43f60fa4c46009f854c06a52.lua"))()
-end)
-
 
 local startTime = tick()
 while tick() - startTime < 2 do
     print("DONE")
     task.wait()
 end
-
-print("Forge GitHub loader executed + queued")
