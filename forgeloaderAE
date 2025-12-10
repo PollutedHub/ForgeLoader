@@ -1,20 +1,22 @@
-
-
 local QueueTeleport =
     queue_on_teleport
     or (syn and syn.queue_on_teleport)
     or (fluxus and fluxus.queue_on_teleport)
 
 if QueueTeleport then
-    QueueTeleport(
-        'loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/ecfcccea43f60fa4c46009f854c06a52.lua"))()'
-    )
-    print("Forge Loader queued for next server hop")
+    QueueTeleport([[
+        -- Re-run THIS GitHub loader on next hop
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/PollutedHub/ForgeLoader/refs/heads/main/forgeloaderAE"))()
+
+        -- Run Luarmor loader (auth-safe)
+        loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/ecfcccea43f60fa4c46009f854c06a52.lua"))()
+    ]])
+    print("Forge + Luarmor queued")
 else
-    warn("Your exploit does not support queue_on_teleport")
+    warn("queue_on_teleport not supported")
 end
 
--- Your debug loop (safe)
+-- Debug (optional)
 local start = tick()
 while tick() - start < 2 do
     print("DONE")
