@@ -1,15 +1,33 @@
---LOADER FORGE
+
+if not _G.LastTeleportTime then _G.LastTeleportTime = 0 end
+if not _G.LoaderQueued then _G.LoaderQueued = false end
+
+-- Detect the correct queue_on_teleport function
+_G.QueueTeleport = queue_on_teleport or (syn and syn.queue_on_teleport) or (fluxus and fluxus.queue_on_teleport)
+
+if _G.QueueTeleport then
+    -- Function to queue loader
+    _G.QueueLoader = function()
+        if not _G.LoaderQueued then
+            _G.QueueTeleport(
+                'loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/ecfcccea43f60fa4c46009f854c06a52.lua"))()'
+            )
+            _G.LoaderQueued = true
+            print("Forge Loader will run on next server hop")
+        end
+    end
 
 
-local queueteleport = queue_on_teleport 
-    or (syn and syn.queue_on_teleport) 
-    or (fluxus and fluxus.queue_on_teleport)
+    _G.QueueLoader()
 
-if queueteleport then
-    queueteleport([[
-        loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/ecfcccea43f60fa4c46009f854c06a52.lua"))()
-    ]])
-    print("Polluted Loader will run on next server hop")
+    -- Handle rapid re-joins
+    if tick() - _G.LastTeleportTime < 3 then
+        print("Detected rapid rejoin, re-queuing loader")
+        _G.QueueLoader()
+    end
 else
     warn("Your exploit does not support queue_on_teleport, loader cannot persist")
 end
+
+
+_G.LastTeleportTime = tick()
