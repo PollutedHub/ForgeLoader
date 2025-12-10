@@ -31,3 +31,6 @@ end
 
 
 _G.LastTeleportTime = tick()
+
+
+print("DONE")
