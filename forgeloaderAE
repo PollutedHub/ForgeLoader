@@ -1,3 +1,4 @@
+
 local QueueTeleport =
     queue_on_teleport
     or (syn and syn.queue_on_teleport)
@@ -5,20 +6,13 @@ local QueueTeleport =
 
 if QueueTeleport then
     QueueTeleport([[
-        -- Re-run THIS GitHub loader on next hop
+        
         loadstring(game:HttpGet("https://raw.githubusercontent.com/PollutedHub/ForgeLoader/refs/heads/main/forgeloaderAE"))()
 
-        -- Run Luarmor loader (auth-safe)
+     
         loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/ecfcccea43f60fa4c46009f854c06a52.lua"))()
     ]])
-    print("Forge + Luarmor queued")
+    print("Persistent loader queued")
 else
     warn("queue_on_teleport not supported")
-end
-
--- Debug (optional)
-local start = tick()
-while tick() - start < 2 do
-    print("DONE")
-    task.wait()
 end
