@@ -23,10 +23,10 @@ if _G.LastJobId ~= game.JobId then
         loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/ecfcccea43f60fa4c46009f854c06a52.lua"))()
     end)
 
-    print("Forge GitHub loader executed + queued for next hop")
+    print("loader")
 else
    
-    print("Luarmor already executed on this server, skipping")
+    print("skipping")
 end
 
 local startTime = tick()
