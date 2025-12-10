@@ -1,20 +1,46 @@
--- GITHUB PERSISTENT LOADER: runs on every server join
+-- GITHUB PERSISTENT LOADER
+-- Robust single Luarmor execution per server
+
 local QueueTeleport =
     queue_on_teleport
     or (syn and syn.queue_on_teleport)
     or (fluxus and fluxus.queue_on_teleport)
 
--- Queue itself for the next server (Luarmor not in queue)
-if QueueTeleport then
-    QueueTeleport([[
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/PollutedHub/ForgeLoader/refs/heads/main/forgeloaderAE"))()
-    ]])
-    print("GitHub loader queued for next server")
+-- Initialize executed servers table if needed
+if not _G.ExecutedServers then
+    _G.ExecutedServers = {}
 end
 
--- Execute Luarmor immediately on this server
-pcall(function()
-    loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/ecfcccea43f60fa4c46009f854c06a52.lua"))()
-end)
+local jobId = game.JobId
 
-print("Luarmor executed on this server")
+-- Only execute Luarmor once per server
+if not _G.ExecutedServers[jobId] then
+    -- Immediately set the lock to prevent race conditions on fast rejoins
+    _G.ExecutedServers[jobId] = true
+
+    -- 1️⃣ Queue GitHub loader for the next server (Luarmor NOT included)
+    if QueueTeleport then
+        QueueTeleport([[
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/PollutedHub/ForgeLoader/refs/heads/main/forgeloaderAE"))()
+        ]])
+        print("GitHub loader queued for next server")
+    end
+
+    -- 2️⃣ Execute Luarmor immediately, deferred to ensure lock is set first
+    task.defer(function()
+        pcall(function()
+            loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/ecfcccea43f60fa4c46009f854c06a52.lua"))()
+        end)
+        print("Luarmor executed on this server")
+    end)
+else
+    -- Already executed on this server, skip
+    print("Luarmor already executed on this server, skipping")
+end
+
+-- Optional debug loop
+local startTime = tick()
+while tick() - startTime < 2 do
+    print("DONE")
+    task.wait()
+end
