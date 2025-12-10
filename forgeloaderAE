@@ -1,42 +1,22 @@
 
-if not _G.LastTeleportTime then _G.LastTeleportTime = 0 end
-if not _G.LoaderQueued then _G.LoaderQueued = false end
 
--- Detect the correct queue_on_teleport function
-_G.QueueTeleport = queue_on_teleport or (syn and syn.queue_on_teleport) or (fluxus and fluxus.queue_on_teleport)
+local QueueTeleport =
+    queue_on_teleport
+    or (syn and syn.queue_on_teleport)
+    or (fluxus and fluxus.queue_on_teleport)
 
-if _G.QueueTeleport then
-    -- Function to queue loader
-    _G.QueueLoader = function()
-        if not _G.LoaderQueued then
-            _G.QueueTeleport(
-                'loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/ecfcccea43f60fa4c46009f854c06a52.lua"))()'
-            )
-            _G.LoaderQueued = true
-            print("Forge Loader will run on next server hop")
-        end
-    end
-
-
-    _G.QueueLoader()
-
-    -- Handle rapid re-joins
-    if tick() - _G.LastTeleportTime < 3 then
-        print("Detected rapid rejoin, re-queuing loader")
-        _G.QueueLoader()
-    end
+if QueueTeleport then
+    QueueTeleport(
+        'loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/ecfcccea43f60fa4c46009f854c06a52.lua"))()'
+    )
+    print("Forge Loader queued for next server hop")
 else
-    warn("Your exploit does not support queue_on_teleport, loader cannot persist")
+    warn("Your exploit does not support queue_on_teleport")
 end
 
-
-_G.LastTeleportTime = tick()
-
-
-local duration = 2
-local startTime = tick()
-
-while tick() - startTime < duration do
-	print("DONE")
-	task.wait() 
+-- Your debug loop (safe)
+local start = tick()
+while tick() - start < 2 do
+    print("DONE")
+    task.wait()
 end
