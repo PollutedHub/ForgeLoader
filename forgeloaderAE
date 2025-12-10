@@ -1,36 +1,20 @@
-
+-- GITHUB PERSISTENT LOADER: runs on every server join
 local QueueTeleport =
     queue_on_teleport
     or (syn and syn.queue_on_teleport)
     or (fluxus and fluxus.queue_on_teleport)
 
-
-if not _G.LastJobId then _G.LastJobId = "" end
-
-if _G.LastJobId ~= game.JobId then
-    _G.LastJobId = game.JobId
-
-
-    if QueueTeleport then
-        QueueTeleport([[
-            loadstring(game:HttpGet("https://raw.githubusercontent.com/PollutedHub/ForgeLoader/refs/heads/main/forgeloaderAE"))()
-            loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/ecfcccea43f60fa4c46009f854c06a52.lua"))()
-        ]])
-    end
-
-   
-    pcall(function()
-        loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/ecfcccea43f60fa4c46009f854c06a52.lua"))()
-    end)
-
-    print("loader")
-else
-   
-    print("skipping")
+-- Queue itself for the next server (Luarmor not in queue)
+if QueueTeleport then
+    QueueTeleport([[
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/PollutedHub/ForgeLoader/refs/heads/main/forgeloaderAE"))()
+    ]])
+    print("GitHub loader queued for next server")
 end
 
-local startTime = tick()
-while tick() - startTime < 2 do
-    print("DONE")
-    task.wait()
-end
+-- Execute Luarmor immediately on this server
+pcall(function()
+    loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/ecfcccea43f60fa4c46009f854c06a52.lua"))()
+end)
+
+print("Luarmor executed on this server")
